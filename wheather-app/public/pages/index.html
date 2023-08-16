@@ -1,0 +1,112 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #getForecastButton {
+      background-color: bisque;
+      height: 4%;
+      width: 4%;
+      border-radius: 15%;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #citySelector {
+      margin: 10px;
+      padding: 5px;
+    }
+
+    #forecastTable {
+      align-items: center;
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    #forecastTable th,
+    #forecastTable td {
+      border: 1px solid #1c0202;
+      text-align: left;
+      padding: 20px;
+    }
+
+    #forecastTable th {
+      background-color: #f2e6e6;
+    }
+  </style>
+  <title>Weather Forecasts</title>
+</head>
+
+<body>
+  <h1>Weather Forecasts</h1>
+  <select id="citySelector">
+    <option value="0">Istanbul</option>
+    <option value="1">Ankara</option>
+    <option value="2">İzmir</option>
+    <!-- Add more cities here -->
+  </select>
+  <button onclick="getForecast()" id="getForecastButton">Show</button>
+  <div id="forecastTable"></div>
+  <script>
+    const getForecastButton = document.getElementById('getForecastButton');
+    const citySelector = document.getElementById('citySelector');
+    const forecastTable = document.getElementById('forecastTable');
+
+    async function getForecast() {
+      let selectedCity = citySelector.value;
+      if (selectedCity == 0) {
+        longitude = 28.979530;
+        latitude = 41.015137
+      }
+      else if (selectedCity == 1) {
+        longitude = 32.866287;
+        latitude = 39.925533;
+      }
+      else {
+        longitude = 27.142826;
+        latitude = 38.423733
+      }
+      const response = await fetch('/api/forecast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude, longitude }),
+      });
+
+      const forecastData = await response.json();
+      let tags = "";
+      forecastData.map(data => {
+        tags += `
+          <tr>
+            <td>${data.date}</td>
+            <td>${data.max}°C</td>
+            <td>${data.min}°C</td>
+            <td>${data.weather}</td>
+          </tr>
+        `;
+      });
+
+      forecastTable.innerHTML = `
+        <table>
+          <tr>
+            <th>Date</th>
+            <th>Max Temp</th>
+            <th>Min Temp</th>
+            <th>Weather</th>
+          </tr>
+          ${tags}
+        </table>
+      `;
+    }
+  </script>
+</body>
